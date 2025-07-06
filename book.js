@@ -1,11 +1,15 @@
 const library = [];
 
+const pageContainer = document.querySelector(".pageContainer");
 const libraryContainer = document.querySelector(".libraryContainer");
 const addBookButton = document.querySelector(".add-book");
+const bookTemplate = document.querySelector("#bookTemplate");
 
 addBookButton.addEventListener("click", addBookForm);
 
 function book(title, author, description) {
+  const BOOKID = crypto.randomUUID();
+  this.id = BOOKID;
   this.title = title;
   this.author = author;
   this.description = description;
@@ -40,21 +44,28 @@ function addBookForm() {
     formElement.remove();
   });
 
-  libraryContainer.appendChild(formElement);
+  pageContainer.appendChild(formElement);
   //TODO: Hide the add book button when the form is displayed
 
   //TODO: show the add book button when the form is submitted
 }
 
 function addBookCard(book) {
-  const bookCard = document.createElement("div");
-  bookCard.classList.add("book");
-
-  bookCard.innerHTML = `
-    <h3>${book.title}</h3>
-    <p>Author: ${book.author}</p>
-    <p>${book.description}</p>
-  `;
-
+  const bookCard = bookTemplate.content.cloneNode(true);
+  bookCard.querySelector(".title").textContent = book.title;
+  bookCard.querySelector(".author").textContent = book.author;
+  bookCard.querySelector(".description").textContent = book.description;
+  bookCard.querySelector(".book").dataset.id = book.id;
+  bookCard.querySelector(".delete-book").addEventListener("click", function () {
+    const bookId = this.closest(".book").dataset.id;
+    const bookIndex = library.findIndex((b) => b.id === bookId);
+    if (bookIndex !== -1) {
+      library.splice(bookIndex, 1);
+      this.closest(".book").remove();
+      console.log(`Book with ID ${bookId} removed from library.`);
+    } else {
+      console.error(`Book with ID ${bookId} not found in library.`);
+    }
+  });
   libraryContainer.appendChild(bookCard);
 }
